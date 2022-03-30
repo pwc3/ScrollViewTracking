@@ -57,7 +57,7 @@ struct ContentView: View {
                                 value: geom.frame(in: .named("frameLayer")).minY
                             )
                     }
-                    .frame(width: 0, height: 0)
+                    .frame(width: 0, height: Self.filterBarHeight)
 
                     ForEach(1..<101) { number in
                         VStack(alignment: .leading) {
@@ -70,10 +70,10 @@ struct ContentView: View {
                 }
                 // this is needed to counter the offset below
                 // otherwise, the bottom cell(s) would not scroll on to the screen
-                .padding(.bottom, Self.titleBarHeight + Self.filterBarHeight)
+                .padding(.bottom, Self.titleBarHeight)
             }
             // move the scroll content down to accomodate being layered under the title barand filter bar
-            .offset(y: Self.titleBarHeight + Self.filterBarHeight)
+            .offset(y: Self.titleBarHeight)
             .coordinateSpace(name: "frameLayer")
         }
         .onPreferenceChange(OffsetPreferenceKey.self) { offset in
@@ -84,11 +84,11 @@ struct ContentView: View {
 
 extension ContentView {
     @MainActor private class ViewModel: ObservableObject {
+        // Updated from the onPreferenceChange of the ContentView
         let offsetY: CurrentValueSubject<CGFloat, Never>
 
-        let deltaY: AnyPublisher<CGFloat, Never>
-
-        private var cancellables: Set<AnyCancellable> = []
+        // Only needed for debugging
+        // private var cancellables: Set<AnyCancellable> = []
 
         @Published var filterBarOffsetY: CGFloat
 
@@ -96,35 +96,37 @@ extension ContentView {
             filterBarOffsetY = titleBarHeight
             offsetY = .init(0)
 
-//            offsetY
-//                .sink {
-//                    print("offsetY:", $0)
-//                }
-//                .store(in: &cancellables)
+            // Debugging
+            // offsetY.sink { print("offsetY:", $0) }.store(in: &cancellables)
 
-            deltaY = Publishers.Zip(offsetY, offsetY.dropFirst())
+            let deltaY = Publishers.Zip(offsetY, offsetY.dropFirst())
                 .map { (prev, curr) in
                     curr - prev
                 }
                 .eraseToAnyPublisher()
 
-//            deltaY
-//                .sink {
-//                    print("deltaY:", $0)
-//                }
-//                .store(in: &cancellables)
+            // Debugging
+            // deltaY.sink { print("deltaY:", $0) }.store(in: &cancellables)
 
-            let showFilterBar = titleBarHeight
-            let hideFilterBar = titleBarHeight - filterBarHeight
+            let offsetToShowFilterBar = titleBarHeight
+            let offsetToHideFilterBar = titleBarHeight - filterBarHeight
 
             Publishers.CombineLatest(offsetY, deltaY)
                 .map { offsetY, deltaY in
-                    if offsetY == titleBarHeight + filterBarHeight || deltaY > 0 {
-                        return showFilterBar
+                    let delta = titleBarHeight - offsetY
+                    if delta > 0 && delta < filterBarHeight {
+                        return offsetY
                     }
 
-                    return hideFilterBar
+                    if offsetY >= titleBarHeight || deltaY > 0 {
+                        return offsetToShowFilterBar
+                    }
+
+                    return offsetToHideFilterBar
                 }
+                .removeDuplicates()
+                .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
+                // .print("filterBarOffsetY")
                 .receive(on: DispatchQueue.main.animation())
                 .assign(to: &self.$filterBarOffsetY)
         }
