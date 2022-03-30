@@ -143,11 +143,13 @@ extension ScrollableContainer {
                         return .track(offsetY: offsetY)
                     }
 
-                    // if deltaY is negative, hide
-                    if deltaY < 0 {
+                    // if offsetY and deltaY are negative, hide
+                    if offsetY < 0 && deltaY < 0 {
+                        print("hide: offsetY =", offsetY)
                         return .hide
                     }
 
+                    print("show: offsetY =", offsetY)
                     return .show
                 }
                 .removeDuplicates()
