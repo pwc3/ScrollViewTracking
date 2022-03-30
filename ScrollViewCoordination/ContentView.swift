@@ -137,36 +137,34 @@ extension ScrollableContainer {
                 .eraseToAnyPublisher()
 
             Publishers.CombineLatest3(offsetY, deltaY, $headerHeight)
-                .map { (offsetY, deltaY, headerHeight) -> State in
+                .compactMap { (offsetY, deltaY, headerHeight) -> State? in
                     // if offsetY is between 0 and -headerHeight, track the position
-                    if -headerHeight < offsetY && offsetY <= 0 {
+                    if -headerHeight < offsetY && offsetY <= 0 && deltaY < 0 {
                         return .track(offsetY: offsetY)
                     }
 
-                    // if offsetY and deltaY are negative, hide
                     if offsetY < 0 && deltaY < 0 {
-                        print("hide: offsetY =", offsetY)
                         return .hide
                     }
+                    else if offsetY < 0 && deltaY >= 0 {
+                        return .show
+                    }
 
-                    print("show: offsetY =", offsetY)
-                    return .show
+                    return nil
                 }
                 .removeDuplicates()
                 .sink { [weak self] state in
-                    switch state {
-                    case .show:
-                        withAnimation {
+                    withAnimation {
+                        switch state {
+                        case .show:
                             self?.headerOffsetY = 0
-                        }
 
-                    case .hide:
-                        withAnimation {
+                        case .hide:
                             self?.headerOffsetY = -(self?.headerHeight ?? 0)
-                        }
 
-                    case .track(let offsetY):
-                        self?.headerOffsetY = offsetY
+                        case .track(let offsetY):
+                            self?.headerOffsetY = offsetY
+                        }
                     }
                 }
                 .store(in: &cancellables)
