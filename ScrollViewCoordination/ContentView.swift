@@ -11,7 +11,7 @@ import SwiftUI
 
 // MARK: - Measure Size
 
-struct SizePreferenceKey: PreferenceKey {
+private struct SizePreferenceKey: PreferenceKey {
     static var defaultValue: CGSize = .zero
 
     static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
@@ -19,7 +19,7 @@ struct SizePreferenceKey: PreferenceKey {
     }
 }
 
-struct MeasureSizeModifier: ViewModifier {
+private struct MeasureSizeModifier: ViewModifier {
     func body(content: Content) -> some View {
         content.background(
             GeometryReader { geometry in
@@ -40,7 +40,7 @@ extension View {
 
 // MARK: - Track Frame
 
-struct FramePreferenceKey: PreferenceKey {
+private struct FramePreferenceKey: PreferenceKey {
     static var defaultValue: CGRect = .zero
 
     static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
@@ -48,7 +48,7 @@ struct FramePreferenceKey: PreferenceKey {
     }
 }
 
-struct TrackFrameModifier: ViewModifier {
+private struct TrackFrameModifier: ViewModifier {
     var coordinateSpace: CoordinateSpace
 
     func body(content: Content) -> some View {
@@ -86,10 +86,11 @@ struct ScrollableContainer<Header, Content>: View where Header: View, Content: V
         self.content = content
     }
 
+    private let coordinateSpaceName = "scrollViewCoordinates"
+
     var body: some View {
         ZStack(alignment: .top) {
             header()
-                .zIndex(-1)
                 .measureSize {
                     viewModel.headerHeight = $0.height
                 }
@@ -98,14 +99,15 @@ struct ScrollableContainer<Header, Content>: View where Header: View, Content: V
             ScrollView {
                 Color.clear
                     .frame(height: viewModel.headerHeight)
-                    .trackFrame(in: .named("containerSpace")) {
+                    .trackFrame(in: .named(coordinateSpaceName)) {
                         viewModel.headerFrame.value = $0
                     }
 
                 content()
             }
-            .coordinateSpace(name: "containerSpace")
+            .coordinateSpace(name: coordinateSpaceName)
         }
+        .clipped()
     }
 }
 
@@ -138,18 +140,15 @@ extension ScrollableContainer {
 
             Publishers.CombineLatest3(offsetY, deltaY, $headerHeight)
                 .compactMap { (offsetY, deltaY, headerHeight) -> State? in
-                    // if offsetY is between 0 and -headerHeight, track the position
                     if -headerHeight < offsetY && offsetY <= 0 && deltaY < 0 {
                         return .track(offsetY: offsetY)
                     }
-
-                    if offsetY < 0 && deltaY < 0 {
+                    else if offsetY < 0 && deltaY < 0 {
                         return .hide
                     }
                     else if offsetY < 0 && deltaY >= 0 {
                         return .show
                     }
-
                     return nil
                 }
                 .removeDuplicates()
@@ -181,7 +180,6 @@ struct ContentView: View {
                 .frame(height: 44)
                 .frame(maxWidth: .infinity)
                 .background(Color.gray)
-                .zIndex(1)
 
             ScrollableContainer {
                 Text("Filter bar")
@@ -189,11 +187,6 @@ struct ContentView: View {
                     .frame(maxWidth: .infinity)
                     .foregroundColor(.white)
                     .background(.black)
-                    .background(
-                        GeometryReader { geom in
-
-                        }
-                    )
             } content: {
                 ForEach(1..<101) { index in
                     VStack(alignment: .leading) {
@@ -207,126 +200,3 @@ struct ContentView: View {
         }
     }
 }
-
-//struct ContentView: View {
-//    @StateObject private var viewModel: ViewModel
-//
-//    private static let titleBarHeight: CGFloat = 44
-//
-//    private static let filterBarHeight: CGFloat = 32
-//
-//    init() {
-//        _viewModel = StateObject(
-//            wrappedValue: ViewModel(
-//                titleBarHeight: Self.titleBarHeight,
-//                filterBarHeight: Self.filterBarHeight
-//            )
-//        )
-//    }
-//
-//    var body: some View {
-//        ZStack(alignment: .top) {
-//            Text("Title bar")
-//                .frame(height: Self.titleBarHeight)
-//                .frame(maxWidth: .infinity)
-//                .background(Color.gray)
-//                .zIndex(2)
-//
-//            Text("Filter bar")
-//                .foregroundColor(.white)
-//                .frame(height: Self.filterBarHeight)
-//                .frame(maxWidth: .infinity)
-//                .background(.black)
-//                .offset(y: viewModel.filterBarOffsetY)
-//                .zIndex(1)
-//
-//            ScrollView {
-//                VStack {
-//                    GeometryReader { geom in
-//                        Color.clear
-//                            .preference(
-//                                key: OffsetPreferenceKey.self,
-//                                value: geom.frame(in: .named("frameLayer")).minY
-//                            )
-//                    }
-//                    .frame(width: 0, height: Self.filterBarHeight)
-//
-//                    ForEach(1..<101) { number in
-//                        VStack(alignment: .leading) {
-//                            Text(number.description)
-//                                .padding(4)
-//                                .padding(.leading, 8)
-//                            Divider()
-//                        }
-//                    }
-//                }
-//                // this is needed to counter the offset below
-//                // otherwise, the bottom cell(s) would not scroll on to the screen
-//                .padding(.bottom, Self.titleBarHeight)
-//            }
-//            // move the scroll content down to accomodate being layered under the title barand filter bar
-//            .offset(y: Self.titleBarHeight)
-//            .coordinateSpace(name: "frameLayer")
-//        }
-//        .onPreferenceChange(OffsetPreferenceKey.self) { offset in
-//            viewModel.offsetY.value = offset
-//        }
-//    }
-//}
-//
-//extension ContentView {
-//    @MainActor private class ViewModel: ObservableObject {
-//        // Updated from the onPreferenceChange of the ContentView
-//        let offsetY: CurrentValueSubject<CGFloat, Never>
-//
-//        // Only needed for debugging
-//        // private var cancellables: Set<AnyCancellable> = []
-//
-//        @Published var filterBarOffsetY: CGFloat
-//
-//        init(titleBarHeight: CGFloat, filterBarHeight: CGFloat) {
-//            filterBarOffsetY = titleBarHeight
-//            offsetY = .init(0)
-//
-//            // Debugging
-//            // offsetY.sink { print("offsetY:", $0) }.store(in: &cancellables)
-//
-//            let deltaY = Publishers.Zip(offsetY, offsetY.dropFirst())
-//                .map { (prev, curr) in
-//                    curr - prev
-//                }
-//                .eraseToAnyPublisher()
-//
-//            // Debugging
-//            // deltaY.sink { print("deltaY:", $0) }.store(in: &cancellables)
-//
-//            let offsetToShowFilterBar = titleBarHeight
-//            let offsetToHideFilterBar = titleBarHeight - filterBarHeight
-//
-//            Publishers.CombineLatest(offsetY, deltaY)
-//                .map { offsetY, deltaY in
-//                    let delta = titleBarHeight - offsetY
-//                    if delta > 0 && delta < filterBarHeight {
-//                        return offsetY
-//                    }
-//
-//                    if offsetY >= titleBarHeight || deltaY > 0 {
-//                        return offsetToShowFilterBar
-//                    }
-//
-//                    return offsetToHideFilterBar
-//                }
-//                .removeDuplicates()
-//                .debounce(for: .milliseconds(50), scheduler: DispatchQueue.main)
-//                // .print("filterBarOffsetY")
-//                .receive(on: DispatchQueue.main.animation())
-//                .assign(to: &self.$filterBarOffsetY)
-//        }
-//    }
-//}
-//
-//struct ContentView_Previews: PreviewProvider {
-//    static var previews: some View {
-//        ContentView()
-//    }
-//}
