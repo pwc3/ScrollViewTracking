@@ -21,10 +21,13 @@ struct SizePreferenceKey: PreferenceKey {
 
 struct MeasureSizeModifier: ViewModifier {
     func body(content: Content) -> some View {
-        content.background(GeometryReader { geometry in
-            Color.clear.preference(key: SizePreferenceKey.self,
-                                   value: geometry.size)
-        })
+        content.background(
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: SizePreferenceKey.self,
+                    value: geometry.size)
+            }
+        )
     }
 }
 
@@ -37,10 +40,40 @@ extension View {
 
 // MARK: - Track Frame
 
+struct FramePreferenceKey: PreferenceKey {
+    static var defaultValue: CGRect = .zero
 
-// MARK: - View
+    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
+        value = nextValue()
+    }
+}
+
+struct TrackFrameModifier: ViewModifier {
+    var coordinateSpace: CoordinateSpace
+
+    func body(content: Content) -> some View {
+        content.background(
+            GeometryReader { geometry in
+                Color.clear.preference(
+                    key: FramePreferenceKey.self,
+                    value: geometry.frame(in: coordinateSpace))
+            }
+        )
+    }
+}
+
+extension View {
+    func trackFrame(in coordinateSpace: CoordinateSpace, perform action: @escaping (CGRect) -> Void) -> some View {
+        self.modifier(TrackFrameModifier(coordinateSpace: coordinateSpace))
+            .onPreferenceChange(FramePreferenceKey.self, perform: action)
+    }
+}
+
+// MARK: - Scrollable Container
 
 struct ScrollableContainer<Header, Content>: View where Header: View, Content: View {
+    @StateObject private var viewModel: ViewModel
+
     @ViewBuilder var header: () -> Header
     @ViewBuilder var content: () -> Content
 
@@ -48,30 +81,98 @@ struct ScrollableContainer<Header, Content>: View where Header: View, Content: V
         @ViewBuilder header: @escaping () -> Header,
         @ViewBuilder content: @escaping () -> Content
     ) {
+        _viewModel = StateObject(wrappedValue: ViewModel())
         self.header = header
         self.content = content
     }
 
-    @State private var headerHeight: CGFloat = 0
-
     var body: some View {
         ZStack(alignment: .top) {
             header()
+                .zIndex(-1)
                 .measureSize {
-                    headerHeight = $0.height
-                    print("header height =", headerHeight)
+                    viewModel.headerHeight = $0.height
                 }
+                .offset(y: viewModel.headerOffsetY)
 
             ScrollView {
                 Color.clear
-                    .frame(height: headerHeight)
+                    .frame(height: viewModel.headerHeight)
+                    .trackFrame(in: .named("containerSpace")) {
+                        viewModel.headerFrame.value = $0
+                    }
 
                 content()
             }
+            .coordinateSpace(name: "containerSpace")
         }
-        .coordinateSpace(name: "containerSpace")
     }
 }
+
+extension ScrollableContainer {
+    @MainActor private class ViewModel: ObservableObject {
+
+        enum State: Equatable {
+            case show
+            case hide
+            case track(offsetY: CGFloat)
+        }
+
+        @Published var headerHeight: CGFloat = 0
+
+        @Published var headerOffsetY: CGFloat = 0
+
+        let headerFrame: CurrentValueSubject<CGRect, Never>
+
+        private var cancellables: Set<AnyCancellable> = []
+
+        init() {
+            headerFrame = .init(.zero)
+            let offsetY = headerFrame.map { $0.minY }
+
+            let deltaY = Publishers.Zip(offsetY, offsetY.dropFirst())
+                .map { (prev, curr) in
+                    curr - prev
+                }
+                .eraseToAnyPublisher()
+
+            Publishers.CombineLatest3(offsetY, deltaY, $headerHeight)
+                .map { (offsetY, deltaY, headerHeight) -> State in
+                    // if offsetY is between 0 and -headerHeight, track the position
+                    if -headerHeight < offsetY && offsetY <= 0 {
+                        return .track(offsetY: offsetY)
+                    }
+
+                    // if deltaY is negative, hide
+                    if deltaY < 0 {
+                        return .hide
+                    }
+
+                    return .show
+                }
+                .removeDuplicates()
+                .sink { [weak self] state in
+                    switch state {
+                    case .show:
+                        withAnimation {
+                            self?.headerOffsetY = 0
+                        }
+
+                    case .hide:
+                        withAnimation {
+                            self?.headerOffsetY = -(self?.headerHeight ?? 0)
+                        }
+
+                    case .track(let offsetY):
+                        self?.headerOffsetY = offsetY
+                    }
+                }
+                .store(in: &cancellables)
+        }
+    }
+}
+
+// MARK: - Demo
 
 struct ContentView: View {
     var body: some View {
@@ -80,6 +181,7 @@ struct ContentView: View {
                 .frame(height: 44)
                 .frame(maxWidth: .infinity)
                 .background(Color.gray)
+                .zIndex(1)
 
             ScrollableContainer {
                 Text("Filter bar")
