@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		C54C653A27F24E41001A1510 /* ScrollViewCoordinationApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C653927F24E41001A1510 /* ScrollViewCoordinationApp.swift */; };
+		C54C653A27F24E41001A1510 /* ScrollViewTrackingApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C653927F24E41001A1510 /* ScrollViewTrackingApp.swift */; };
 		C54C653C27F24E41001A1510 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C653B27F24E41001A1510 /* ContentView.swift */; };
 		C54C653E27F24E42001A1510 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C54C653D27F24E42001A1510 /* Assets.xcassets */; };
 		C54C654127F24E42001A1510 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C54C654027F24E42001A1510 /* Preview Assets.xcassets */; };
@@ -17,14 +17,16 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		C54C653627F24E41001A1510 /* ScrollViewCoordination.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollViewCoordination.app; sourceTree = BUILT_PRODUCTS_DIR; };
-		C54C653927F24E41001A1510 /* ScrollViewCoordinationApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewCoordinationApp.swift; sourceTree = "<group>"; };
+		C54C653627F24E41001A1510 /* ScrollViewTracking.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ScrollViewTracking.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		C54C653927F24E41001A1510 /* ScrollViewTrackingApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScrollViewTrackingApp.swift; sourceTree = "<group>"; };
 		C54C653B27F24E41001A1510 /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
 		C54C653D27F24E42001A1510 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C54C654027F24E42001A1510 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		C54C655727F4F948001A1510 /* MeasureSize.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MeasureSize.swift; sourceTree = "<group>"; };
 		C54C655927F4F964001A1510 /* TrackFrame.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TrackFrame.swift; sourceTree = "<group>"; };
 		C54C655B27F4F98A001A1510 /* FloatingHeaderContainer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FloatingHeaderContainer.swift; sourceTree = "<group>"; };
+		C54C655D27F5F26F001A1510 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		C54C655E27F5F26F001A1510 /* LICENSE */ = {isa = PBXFileReference; lastKnownFileType = text; path = LICENSE; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -41,23 +43,25 @@
 		C54C652D27F24E41001A1510 = {
 			isa = PBXGroup;
 			children = (
-				C54C653827F24E41001A1510 /* ScrollViewCoordination */,
+				C54C653827F24E41001A1510 /* ScrollViewTracking */,
 				C54C653727F24E41001A1510 /* Products */,
+				C54C655E27F5F26F001A1510 /* LICENSE */,
+				C54C655D27F5F26F001A1510 /* README.md */,
 			);
 			sourceTree = "<group>";
 		};
 		C54C653727F24E41001A1510 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				C54C653627F24E41001A1510 /* ScrollViewCoordination.app */,
+				C54C653627F24E41001A1510 /* ScrollViewTracking.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
 		};
-		C54C653827F24E41001A1510 /* ScrollViewCoordination */ = {
+		C54C653827F24E41001A1510 /* ScrollViewTracking */ = {
 			isa = PBXGroup;
 			children = (
-				C54C653927F24E41001A1510 /* ScrollViewCoordinationApp.swift */,
+				C54C653927F24E41001A1510 /* ScrollViewTrackingApp.swift */,
 				C54C653B27F24E41001A1510 /* ContentView.swift */,
 				C54C653D27F24E42001A1510 /* Assets.xcassets */,
 				C54C653F27F24E42001A1510 /* Preview Content */,
@@ -65,7 +69,7 @@
 				C54C655727F4F948001A1510 /* MeasureSize.swift */,
 				C54C655B27F4F98A001A1510 /* FloatingHeaderContainer.swift */,
 			);
-			path = ScrollViewCoordination;
+			path = ScrollViewTracking;
 			sourceTree = "<group>";
 		};
 		C54C653F27F24E42001A1510 /* Preview Content */ = {
@@ -79,9 +83,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		C54C653527F24E41001A1510 /* ScrollViewCoordination */ = {
+		C54C653527F24E41001A1510 /* ScrollViewTracking */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = C54C654427F24E42001A1510 /* Build configuration list for PBXNativeTarget "ScrollViewCoordination" */;
+			buildConfigurationList = C54C654427F24E42001A1510 /* Build configuration list for PBXNativeTarget "ScrollViewTracking" */;
 			buildPhases = (
 				C54C653227F24E41001A1510 /* Sources */,
 				C54C653327F24E41001A1510 /* Frameworks */,
@@ -91,11 +95,11 @@
 			);
 			dependencies = (
 			);
-			name = ScrollViewCoordination;
+			name = ScrollViewTracking;
 			packageProductDependencies = (
 			);
 			productName = ScrollViewCoordination;
-			productReference = C54C653627F24E41001A1510 /* ScrollViewCoordination.app */;
+			productReference = C54C653627F24E41001A1510 /* ScrollViewTracking.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -113,7 +117,7 @@
 					};
 				};
 			};
-			buildConfigurationList = C54C653127F24E41001A1510 /* Build configuration list for PBXProject "ScrollViewCoordination" */;
+			buildConfigurationList = C54C653127F24E41001A1510 /* Build configuration list for PBXProject "ScrollViewTracking" */;
 			compatibilityVersion = "Xcode 13.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -128,7 +132,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				C54C653527F24E41001A1510 /* ScrollViewCoordination */,
+				C54C653527F24E41001A1510 /* ScrollViewTracking */,
 			);
 		};
 /* End PBXProject section */
@@ -152,7 +156,7 @@
 			files = (
 				C54C655C27F4F98A001A1510 /* FloatingHeaderContainer.swift in Sources */,
 				C54C653C27F24E41001A1510 /* ContentView.swift in Sources */,
-				C54C653A27F24E41001A1510 /* ScrollViewCoordinationApp.swift in Sources */,
+				C54C653A27F24E41001A1510 /* ScrollViewTrackingApp.swift in Sources */,
 				C54C655827F4F948001A1510 /* MeasureSize.swift in Sources */,
 				C54C655A27F4F964001A1510 /* TrackFrame.swift in Sources */,
 			);
@@ -336,7 +340,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		C54C653127F24E41001A1510 /* Build configuration list for PBXProject "ScrollViewCoordination" */ = {
+		C54C653127F24E41001A1510 /* Build configuration list for PBXProject "ScrollViewTracking" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C54C654227F24E42001A1510 /* Debug */,
@@ -345,7 +349,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		C54C654427F24E42001A1510 /* Build configuration list for PBXNativeTarget "ScrollViewCoordination" */ = {
+		C54C654427F24E42001A1510 /* Build configuration list for PBXNativeTarget "ScrollViewTracking" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				C54C654527F24E42001A1510 /* Debug */,

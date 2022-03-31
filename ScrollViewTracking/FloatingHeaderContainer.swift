@@ -1,6 +1,6 @@
 //
 //  FloatingHeaderContainer.swift
-//  ScrollViewCoordination
+//  ScrollViewTracking
 //
 //  Copyright (c) 2022 Rocket Insights, Inc.
 //

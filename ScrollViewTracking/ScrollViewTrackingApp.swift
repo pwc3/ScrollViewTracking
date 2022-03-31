@@ -1,6 +1,6 @@
 //
-//  ContentView.swift
-//  ScrollViewCoordination
+//  ScrollViewTrackingApp.swift
+//  ScrollViewTracking
 //
 //  Copyright (c) 2022 Rocket Insights, Inc.
 //
@@ -25,30 +25,11 @@
 
 import SwiftUI
 
-struct ContentView: View {
-    var body: some View {
-        VStack(spacing: 0) {
-            Text("Title bar")
-                .frame(height: 44)
-                .frame(maxWidth: .infinity)
-                .background(Color.gray)
-
-            FloatingHeaderContainer {
-                Text("Header bar")
-                    .frame(height: 32)
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.white)
-                    .background(Color(white: 0.2))
-            } content: {
-                ForEach(1..<101) { index in
-                    VStack(alignment: .leading) {
-                        Text(index.description)
-                            .padding(4)
-                            .padding(.leading, 8)
-                        Divider()
-                    }
-                }
-            }
+@main
+struct ScrollViewTrackingApp: App {
+    var body: some Scene {
+        WindowGroup {
+            ContentView()
         }
     }
 }
