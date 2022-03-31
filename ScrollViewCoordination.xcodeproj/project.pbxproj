@@ -11,7 +11,6 @@
 		C54C653C27F24E41001A1510 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C653B27F24E41001A1510 /* ContentView.swift */; };
 		C54C653E27F24E42001A1510 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C54C653D27F24E42001A1510 /* Assets.xcassets */; };
 		C54C654127F24E42001A1510 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C54C654027F24E42001A1510 /* Preview Assets.xcassets */; };
-		C54C655327F49931001A1510 /* CombineSchedulers in Frameworks */ = {isa = PBXBuildFile; productRef = C54C655227F49931001A1510 /* CombineSchedulers */; };
 		C54C655827F4F948001A1510 /* MeasureSize.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C655727F4F948001A1510 /* MeasureSize.swift */; };
 		C54C655A27F4F964001A1510 /* TrackFrame.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C655927F4F964001A1510 /* TrackFrame.swift */; };
 		C54C655C27F4F98A001A1510 /* FloatingHeaderContainer.swift in Sources */ = {isa = PBXBuildFile; fileRef = C54C655B27F4F98A001A1510 /* FloatingHeaderContainer.swift */; };
@@ -33,7 +32,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				C54C655327F49931001A1510 /* CombineSchedulers in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -95,7 +93,6 @@
 			);
 			name = ScrollViewCoordination;
 			packageProductDependencies = (
-				C54C655227F49931001A1510 /* CombineSchedulers */,
 			);
 			productName = ScrollViewCoordination;
 			productReference = C54C653627F24E41001A1510 /* ScrollViewCoordination.app */;
@@ -126,7 +123,6 @@
 			);
 			mainGroup = C54C652D27F24E41001A1510;
 			packageReferences = (
-				C54C655127F49931001A1510 /* XCRemoteSwiftPackageReference "combine-schedulers" */,
 			);
 			productRefGroup = C54C653727F24E41001A1510 /* Products */;
 			projectDirPath = "";
@@ -359,25 +355,6 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
-
-/* Begin XCRemoteSwiftPackageReference section */
-		C54C655127F49931001A1510 /* XCRemoteSwiftPackageReference "combine-schedulers" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/pointfreeco/combine-schedulers.git";
-			requirement = {
-				kind = upToNextMinorVersion;
-				minimumVersion = 0.5.3;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
-
-/* Begin XCSwiftPackageProductDependency section */
-		C54C655227F49931001A1510 /* CombineSchedulers */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = C54C655127F49931001A1510 /* XCRemoteSwiftPackageReference "combine-schedulers" */;
-			productName = CombineSchedulers;
-		};
-/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = C54C652E27F24E41001A1510 /* Project object */;
 }
