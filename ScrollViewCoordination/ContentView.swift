@@ -16,11 +16,11 @@ struct ContentView: View {
                 .background(Color.gray)
 
             FloatingHeaderContainer {
-                Text("Filter bar")
+                Text("Header bar")
                     .frame(height: 32)
                     .frame(maxWidth: .infinity)
                     .foregroundColor(.white)
-                    .background(.black)
+                    .background(Color(white: 0.2))
             } content: {
                 ForEach(1..<101) { index in
                     VStack(alignment: .leading) {
