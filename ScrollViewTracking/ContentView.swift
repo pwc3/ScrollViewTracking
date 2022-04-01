@@ -26,6 +26,7 @@
 import SwiftUI
 
 struct ContentView: View {
+
     var body: some View {
         VStack(spacing: 0) {
             Text("Title bar")
@@ -34,20 +35,51 @@ struct ContentView: View {
                 .background(Color.gray)
 
             FloatingHeaderContainer {
-                Text("Header bar")
-                    .frame(height: 32)
-                    .frame(maxWidth: .infinity)
-                    .foregroundColor(.white)
-                    .background(Color(white: 0.2))
+                HeaderView()
             } content: {
-                ForEach(1..<101) { index in
-                    VStack(alignment: .leading) {
-                        Text(index.description)
-                            .padding(4)
-                            .padding(.leading, 8)
-                        Divider()
-                    }
+                BodyView()
+            }
+        }
+    }
+}
+
+struct HeaderView: View {
+    private var values: [String] {
+        let formatter = NumberFormatter()
+        formatter.numberStyle = .spellOut
+        return (1..<21).map {
+            formatter.string(from: NSNumber(value: $0))!
+        }
+    }
+
+    var body: some View {
+        ScrollView(.horizontal, showsIndicators: false) {
+            HStack(spacing: 8) {
+                // Originally, I used Color.clear here with .frame(width: 20).
+                // This caused the horizontal scroll view to fill the height of the screen.
+                // Using a Spacer works as intended
+                Spacer(minLength: 20)
+
+                ForEach(values, id: \.self) {
+                    Text($0)
+                        .foregroundColor(.white)
+                        .padding([.top, .bottom], 8)
                 }
+
+                Spacer(minLength: 20)
+            }
+        }
+        .background(Color(white: 0.2))
+    }
+}
+
+struct BodyView: View {
+    var body: some View {
+        ForEach(1..<101) { index in
+            VStack(alignment: .leading, spacing: 0) {
+                Divider()
+                Text(index.description)
+                    .padding()
             }
         }
     }

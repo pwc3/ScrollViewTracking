@@ -27,15 +27,12 @@ import SwiftUI
 
 /**
  Uses a `PreferenceKey` to communicate a view's size up the view hierarcny.
-
- We could extend this by attaching a `Hashable` identifier to the `MeasureSizeModifier` and then
- building a dictionary of identifier to `CGSize` in the `reduce(value:nextValue:)` function.
  */
 private struct SizePreferenceKey: PreferenceKey {
-    static var defaultValue: CGSize = .zero
+    static var defaultValue: [String : CGSize] = [:]
 
-    static func reduce(value: inout CGSize, nextValue: () -> CGSize) {
-        value = nextValue()
+    static func reduce(value: inout [String : CGSize], nextValue: () -> [String : CGSize]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
@@ -46,12 +43,16 @@ private struct SizePreferenceKey: PreferenceKey {
  up the view hierarchy.
  */
 private struct MeasureSizeModifier: ViewModifier {
+    var name: String
+
     func body(content: Content) -> some View {
         content.background(
             GeometryReader { geometry in
-                Color.clear.preference(
-                    key: SizePreferenceKey.self,
-                    value: geometry.size)
+                Color.clear
+                    .preference(
+                        key: SizePreferenceKey.self,
+                        value: [name: geometry.size]
+                    )
             }
         )
     }
@@ -64,9 +65,13 @@ private struct MeasureSizeModifier: ViewModifier {
  with the size as an argument.
  */
 extension View {
-    func measureSize(perform action: @escaping (CGSize) -> Void) -> some View {
-        self.modifier(MeasureSizeModifier())
-            .onPreferenceChange(SizePreferenceKey.self, perform: action)
+    func measureSize(name: String, perform action: @escaping (CGSize) -> Void) -> some View {
+        self.modifier(MeasureSizeModifier(name: name))
+            .onPreferenceChange(SizePreferenceKey.self) { newValue in
+                newValue[name].map {
+                    action($0)
+                }
+            }
     }
 }
 

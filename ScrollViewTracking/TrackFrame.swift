@@ -27,15 +27,12 @@ import SwiftUI
 
 /**
  Use a `PreferenceKey` to communicate a view's frame up the view hierarchy.
-
- We could extend this by attaching a `Hashable` identifier to the `TrackFrameModifier` and then
- building a dictionary of identifier to `CGRect` in the `reduce(value:nextValue:)` function.
  */
 private struct FramePreferenceKey: PreferenceKey {
-    static var defaultValue: CGRect = .zero
+    static var defaultValue: [String : CGRect] = [:]
 
-    static func reduce(value: inout CGRect, nextValue: () -> CGRect) {
-        value = nextValue()
+    static func reduce(value: inout [String : CGRect], nextValue: () -> [String : CGRect]) {
+        value.merge(nextValue(), uniquingKeysWith: { $1 })
     }
 }
 
@@ -46,6 +43,8 @@ private struct FramePreferenceKey: PreferenceKey {
  up the view hierarchy.
  */
 private struct TrackFrameModifier: ViewModifier {
+    var name: String
+
     var coordinateSpace: CoordinateSpace
 
     func body(content: Content) -> some View {
@@ -54,7 +53,7 @@ private struct TrackFrameModifier: ViewModifier {
                 Color.clear
                     .preference(
                         key: FramePreferenceKey.self,
-                        value: geometry.frame(in: coordinateSpace)
+                        value: [name: geometry.frame(in: coordinateSpace)]
                     )
             }
         )
@@ -69,8 +68,12 @@ private struct TrackFrameModifier: ViewModifier {
  with the frame as an argument.
  */
 extension View {
-    func trackFrame(in coordinateSpace: CoordinateSpace, perform action: @escaping (CGRect) -> Void) -> some View {
-        self.modifier(TrackFrameModifier(coordinateSpace: coordinateSpace))
-            .onPreferenceChange(FramePreferenceKey.self, perform: action)
+    func trackFrame(name: String, in coordinateSpace: CoordinateSpace, perform action: @escaping (CGRect) -> Void) -> some View {
+        self.modifier(TrackFrameModifier(name: name, coordinateSpace: coordinateSpace))
+            .onPreferenceChange(FramePreferenceKey.self) { newValue in
+                newValue[name].map {
+                    action($0)
+                }
+            }
     }
 }

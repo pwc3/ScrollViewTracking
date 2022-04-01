@@ -48,40 +48,45 @@ struct FloatingHeaderContainer<Header, Content>: View where Header: View, Conten
     }
 
     /// Symbolic constant for the coordinate space name, used in frame computations.
-    private let coordinateSpaceName = "scrollViewCoordinates"
+    private let scrollViewCoordinateSpace = "scrollViewCoordinates"
 
     var body: some View {
         // Use a ZStack to put the header on top of the scroll view.
         ZStack(alignment: .top) {
-
-            // Measure the header's actual size and save its height to the view model.
-            // Offset the header vertically per the view model's computations. Since we
-            // specify that the ZStack is clipped, moving this to a negative offset will
-            // hide the header. An offset of 0 will show it in its default location.
-            header()
-                .measureSize {
-                    viewModel.headerHeight = $0.height
-                }
-                .offset(y: viewModel.headerOffsetY)
-
             ScrollView {
-                // Place a blank space at the top of the scroll view to match the header's height.
-                // When shown, the header will overlap this space. The idea is to never show this
-                // space without the header obscuring it, so we need to track it's location so as
-                // to hide the header when it scroll off screen and show the header when it comes
-                // back on screen.
-                Color.clear
-                    .frame(height: viewModel.headerHeight)
-                    .trackFrame(in: .named(coordinateSpaceName)) {
-                        viewModel.headerFrame.send($0)
-                    }
+                // It seems a VStack is implicitly added to the scroll view if we don't specify one.
+                // The implicitly-added one has a non-zero spacing value.
+                VStack(spacing: 0) {
+                    // Place a blank space at the top of the scroll view to match the header's height.
+                    // When shown, the header will overlap this space. The idea is to never show this
+                    // space without the header obscuring it, so we need to track it's location so as
+                    // to hide the header when it scroll off screen and show the header when it comes
+                    // back on screen.
+                    Color.clear
+                        .frame(height: viewModel.headerHeight)
+                        .trackFrame(name: "scrollViewHeader", in: .named(scrollViewCoordinateSpace)) {
+                            viewModel.headerFrame.send($0)
+                        }
 
-                // Place the content below the blank space used to track scrolling.
-                content()
+                    // Place the content below the blank space used to track scrolling.
+                    content()
+                }
             }
 
             // Specify the coordinate space of the scroll view for use when tracking the frame.
-            .coordinateSpace(name: coordinateSpaceName)
+            .coordinateSpace(name: scrollViewCoordinateSpace)
+
+            // Place the header second, on top of the scroll view.
+            header()
+                // Measure the header's actual size and save its height to the view model.
+                .measureSize(name: "headerSize") {
+                    viewModel.headerHeight = $0.height
+                }
+
+                // Offset the header vertically per the view model's computations. Since we
+                // specify that the ZStack is clipped, moving this to a negative offset will
+                // hide the header. An offset of 0 will show it in its default location.
+                .offset(y: viewModel.headerOffsetY)
         }
         .clipped()
     }
